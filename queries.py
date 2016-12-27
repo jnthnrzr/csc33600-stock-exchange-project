@@ -1,11 +1,11 @@
 import MySQLdb
 import MySQLdb.cursors
-import config
+import settings
 
-db = MySQLdb.connect(host=HOST,
-                     user=USER,
-                     passwd=PASSWD,
-                     db=DB,
+db = MySQLdb.connect(host=settings.HOST,
+                     user=settings.USER,
+                     passwd=settings.PASSWD,
+                     db=settings.DB,
                      cursorclass=MySQLdb.cursors.DictCursor)
 
 cur = db.cursor()
