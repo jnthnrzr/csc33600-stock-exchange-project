@@ -1,9 +1,13 @@
+#!/usr/bin/env python
 """entities.py
 
 Defines the Portfolio, Investor, and Broker classes
 """
+import logging
 
 
+logging.basicConfig(level=logging.DEBUG,
+                    format=' %(asctime)s - %(levelname)s - %(message)s')
 # List of all Investors for broker to access
 INVESTORS = list()
 
