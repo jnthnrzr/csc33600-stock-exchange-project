@@ -3,7 +3,7 @@ Final project for Database Systems
 
 *python version: 2.6.6*
 
-entities.py contains class definitions for Portfolio, Broker, and Investor  
+[entities.py](entities.py) contains class definitions for Portfolio, Broker, and Investor  
 
 settings.py contains authentication info for connecting to database
 
