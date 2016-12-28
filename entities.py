@@ -7,7 +7,10 @@ import logging
 
 
 logging.basicConfig(level=logging.DEBUG,
+                    filename='entities.log',
                     format=' %(asctime)s - %(levelname)s - %(message)s')
+# logging.disable(logging.CRITICAL)
+
 # List of all Investors for broker to access
 INVESTORS = list()
 
@@ -35,7 +38,8 @@ class Portfolio:
         """Remove stocks of given symbol and quantity from the portfolio"""
         for p_symbol, p_quantity, p_unit_price in self.portfolios:
             if p_symbol == symbol:
-                print "Found %s" % p_symbol, p_quantity, p_unit_price
+                logging.debug("Found %s, %s, %s" %
+                              (p_symbol, p_quantity, p_unit_price))
                 # TODO delete total value of stock from portfolio
                 p_total_price = p_quantity * p_unit_price
                 self.value -= p_total_price
@@ -45,7 +49,7 @@ class Portfolio:
 
     def __repr__(self):
         """Show details about the portfolio"""
-        return str(self.portfolios) + ", valued at " + str(self.value)
+        return "<Portfolio: %s | valued at %s>" % (self.portfolios, self.value)
 
 
 class Investor:
@@ -80,7 +84,7 @@ class Investor:
 
     def __str__(self):
         """Show string representation of the Investor"""
-        return "<Investor: %s | Portfolio: %s >" % (self.name, self.portfolios)
+        return "<Investor: %s | Portfolio: %s>" % (self.name, self.portfolios)
 
 
 class Broker:
@@ -116,39 +120,40 @@ class Broker:
 
     def __str__(self):
         """Show string representation of the Broker"""
-        return "<Broker: %s | Portfolio: %s >" % (self.name, self.portfolios)
+        return "<Broker: %s | Portfolio: %s>" % (self.name, self.portfolios)
+
 
 if __name__ == "__main__":
-    print "Creating portfolio1... "
+    logging.info("Creating portfolio1... ")
     p1 = Portfolio()
     p1.add_stock("BMD", 50)
     p1.add_stock("AZA", 10)
     p1.add_stock("ATI", 50)
     p1.add_stock("AYZ", 40)
 
-    print "Creating broker1"
+    logging.info("Creating broker1")
     broker1 = Broker("GordonGekko")
 
-    print "Creating investor1"
+    logging.info("Creating investor1")
     investor1 = Investor("JohnDoe", 200000)
 
-    print "Adding portfolio1 to broker1... "
+    logging.info("Adding portfolio1 to broker1")
     broker1.add_portfolio(p1)
 
-    print "Adding portfolio1 to investor1... "
+    logging.info("Adding portfolio1 to investor1")
     investor1.add_portfolio(p1)
 
-    print "Displaying broker1 info: "
-    print broker1
+    logging.info("Displaying broker1 info AFTER ADDING portfolio")
+    logging.info(broker1)
 
-    print "Displaying investor1 info: "
-    print investor1
+    logging.info("Displaying investor1 info AFTER ADDING portfolio")
+    logging.info(investor1)
 
-    print "Removing stock BMD from portfolio..."
+    logging.info("Removing stock 'BMD' from portfolio")
     p1.remove_stock("BMD")
 
-    print "broker1 info after removing stock "
-    print broker1
+    logging.info("Displaying broker1 info AFTER REMOVING stock")
+    logging.info(broker1)
 
-    print "investor1 info after removing stock"
-    print investor1
+    logging.info("Displaying investor1 info AFTER REMOVING stock")
+    logging.info(investor1)
