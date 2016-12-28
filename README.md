@@ -10,6 +10,6 @@ Final project for Database Systems
 [settings.py](settings.py) contains authentication info for connecting to database.
 
 ___
-Sensitive information in [settings.py](settings.py) can be ignored by:
+###### Sensitive information in [settings.py](settings.py) can be ignored by:
 
 `git update-index --assume-unchanged settings.py`
