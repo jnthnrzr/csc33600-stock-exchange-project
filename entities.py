@@ -7,7 +7,8 @@ import logging
 
 
 logging.basicConfig(level=logging.DEBUG,
-                    filename='entities.log',
+                    # filename='entities.log',
+                    # mode='w',
                     format=' %(asctime)s - %(levelname)s - %(message)s')
 # logging.disable(logging.CRITICAL)
 
@@ -26,12 +27,12 @@ class Portfolio:
         self.portfolios = list()
         self.value = 0.00
 
-    def add_stock(self, symbol, quantity):
+    def add_stock(self, symbol, quantity, unit_price):
         """Add stock of given symbol and quantity to the portfolio"""
-        stock_price_unit = 10   # TODO write SQL statement
-        stock_price_total = 1000   # TODO write SQL statement
-        # TODO deduct stock quantity from market
-        self.portfolios.append((symbol, quantity, stock_price_unit))
+        # TODO write SQL statement to grab unit_price
+        stock_price_total = quantity * unit_price  # TODO write SQL statement
+        # TODO deduct stock quantity from market ??
+        self.portfolios.append((symbol, quantity, unit_price))
         self.value += stock_price_total
 
     def remove_stock(self, symbol):
@@ -40,7 +41,6 @@ class Portfolio:
             if p_symbol == symbol:
                 logging.debug("Found %s, %s, %s" %
                               (p_symbol, p_quantity, p_unit_price))
-                # TODO delete total value of stock from portfolio
                 p_total_price = p_quantity * p_unit_price
                 self.value -= p_total_price
                 self.portfolios.remove((p_symbol,
@@ -126,10 +126,10 @@ class Broker:
 if __name__ == "__main__":
     logging.info("Creating portfolio1... ")
     p1 = Portfolio()
-    p1.add_stock("BMD", 50)
-    p1.add_stock("AZA", 10)
-    p1.add_stock("ATI", 50)
-    p1.add_stock("AYZ", 40)
+    p1.add_stock("BMD", 50, 15)
+    p1.add_stock("AZA", 10, 15)
+    p1.add_stock("ATI", 50, 15)
+    p1.add_stock("AYZ", 40, 15)
 
     logging.info("Creating broker1")
     broker1 = Broker("GordonGekko")
