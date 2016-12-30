@@ -35,17 +35,25 @@ class Portfolio:
         self.portfolios.append((symbol, quantity, unit_price))
         self.value += stock_price_total
 
-    def remove_stock(self, symbol):
+    def remove_stock(self, symbol, quantity):
         """Remove stocks of given symbol and quantity from the portfolio"""
         for p_symbol, p_quantity, p_unit_price in self.portfolios:
             if p_symbol == symbol:
                 logging.debug("Found %s, %s, %s" %
                               (p_symbol, p_quantity, p_unit_price))
-                p_total_price = p_quantity * p_unit_price
-                self.value -= p_total_price
+                # First delete completely
                 self.portfolios.remove((p_symbol,
                                         p_quantity,
                                         p_unit_price))
+                # Check if some quantity of stocks should remain
+                if quantity < p_quantity:
+                    # Keep remainder
+                    self.portfolios.append((p_symbol,
+                                            p_quantity-quantity,
+                                            p_unit_price))
+                # Reduce value of portfolio by value of stocks removed
+                total_price = quantity * p_unit_price
+                self.value -= total_price
 
     def __repr__(self):
         """Show details about the portfolio"""
