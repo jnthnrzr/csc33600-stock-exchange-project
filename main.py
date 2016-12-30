@@ -83,14 +83,22 @@ logging.info("PRINTING broker: %s" % broker)
 for count in range(0, 21+1):
     if count % broker.term == 0:
         logging.debug("Count mod term is 0.")
+
     else:
         logging.debug("Count = %s" % count)
 
-
-give_stocks_margin(margin1, broker)
-give_stocks_margin(margin2, broker)
-give_stocks_short(short1, broker)
+logging.info(broker.portfolios)
 give_stocks_short(short2, broker)
 
+logging.info(broker.portfolios)
+give_stocks_margin(margin1, broker)
+
+logging.info(broker.portfolios)
+give_stocks_margin(margin2, broker)
+
+logging.info(broker.portfolios)
+give_stocks_short(short1, broker)
+
+logging.info(broker.portfolios)
 
 db.close()
