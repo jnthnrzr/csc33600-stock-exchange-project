@@ -1,4 +1,5 @@
 from entities import Portfolio, Investor, Broker
+from margin import give_stocks_margin
 from decimal import Decimal
 import MySQLdb
 import MySQLdb.cursors
@@ -61,7 +62,14 @@ for stock in stocks:
     # print "Price of stock is $%s" % price
     broker_portfolio.add_stock(stock, qty, price)
 
+
 print "Broker's portfolio is %s" % broker_portfolio
+
+# Adding broker_portfolio to broker
+broker.add_portfolio(broker_portfolio)
+
+print "PRINTING broker: %s" % broker
+
 
 # Start a counter
 for count in range(0, 21+1):
@@ -69,5 +77,14 @@ for count in range(0, 21+1):
         print "Count mod term is 0."
     else:
         print "Count = %s" % count
+
+# rndm = random.choice(broker.portfolios[0].portfolios)
+# print type(broker.portfolios)
+# print "Randomly chose %s from broker_portfolio" % str(rndm)
+
+
+give_stocks_margin(short1, broker)
+
+
 
 db.close()
