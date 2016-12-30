@@ -25,7 +25,7 @@ class Portfolio:
     def __init__(self):
         """Make a portfolio to keep track of stocks"""
         self.portfolios = list()
-        self.value = 0.00
+        self.value = 0
 
     def add_stock(self, symbol, quantity, unit_price):
         """Add stock of given symbol and quantity to the portfolio"""
