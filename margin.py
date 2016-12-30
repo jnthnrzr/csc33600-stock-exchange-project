@@ -1,6 +1,7 @@
 """margin.py
 
-Functions for margin investors"""
+Functions for margin investors
+"""
 # from decimal import Decimal
 import random
 from entities import Portfolio
@@ -16,7 +17,6 @@ def give_stocks_margin(investor, broker):
         broker.cash = broker.cash - loan
 
         r_stk_name, r_stk_quant, r_stk_price = random.choice(broker.portfolios[0].portfolios)
-        
         # r_stk_name = rand_stock[0]
         # r_stk_quant = rand_stock[1]
         # r_stk_price = rand_stock[2]
