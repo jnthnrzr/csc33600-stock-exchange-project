@@ -15,7 +15,8 @@ logging.basicConfig(level=logging.DEBUG,
 
 def give_stocks_short(investor, broker):
     """Investor gets a random share from broker for short selling"""
-    
+
+    logging.info("RUNNING give_stocks_short()...")
     # Take a loan from broker to investor
     loan = min(investor.credit_line, investor.risk_money)
     investor.cash += loan
@@ -30,6 +31,8 @@ def give_stocks_short(investor, broker):
     sym, qty, price = random.choice(broker.portfolios[0].portfolios)
 
     logging.info("Picked stock %s, qty %s, price %s" % (sym, qty, price))
+
+    # Buy correct quantity
     qty_tobuy = int ( (investor.cash / Decimal(price)) )
     logging.info( "qty %s to buy of %s" % (qty_tobuy, sym) )
 
@@ -50,4 +53,10 @@ def give_stocks_short(investor, broker):
     investor.add_portfolio(p)
     logging.info("stock %s, %s, %s has been added" % (sym, qty, price))
     logging.info("Displaying investors: %s" % (investor))
+
+    # Remove stock from broker's portfolio
+    logging.info("Broker's portfolio BEROFE removal: %s" % (broker.portfolios[0].portfolios))
+    broker.portfolios[0].remove_stock(sym, qty)
+
+    logging.info("Broker portfolio AFTER removal: %s" % (broker.portfolios[0].portfolios))
     
