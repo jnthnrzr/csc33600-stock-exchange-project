@@ -2,10 +2,17 @@ from entities import Portfolio, Investor, Broker
 from margin import give_stocks_margin
 from short import give_stocks_short
 from decimal import Decimal
+import logging
 import MySQLdb
 import MySQLdb.cursors
-import settings
 import random
+import settings
+
+
+# Setup logging configurations
+logging.basicConfig(level=logging.DEBUG,
+                    format=' %(levelname)s - hello - %(asctime)s - %(module)s:%(lineno)d - %(message)s')
+logging.disable(logging.DEBUG)
 
 # Make a connection to database
 db = MySQLdb.connect(host=settings.HOST,
@@ -45,47 +52,45 @@ broker_portfolio = Portfolio()
 
 # Select 4 stocks at random
 stocks = random.sample(all_stocks, 4)
-# print "Stocks to add are %s" % (stocks)
+# logging.info("Stocks to add are %s" % (stocks)
 query= 'SELECT SUM(OPEN_PRICE) FROM STOCK_HISTORY WHERE TRADING_SYMBOL IN ("%s","%s","%s","%s") AND TRADE_DATE="2005-02-08"' % (stocks[0], stocks[1], stocks[2], stocks[3])
 cur.execute(query)
 result = cur.fetchone()
 sum_price = int(result["SUM(OPEN_PRICE)"])
 qty = int(round(broker.stock_money / sum_price, 0))
-# print "Volume to add for each stock is %s" % qty
+# logging.info("Volume to add for each stock is %s" % qty
 
 # Find stock info and add to portfolio
 for stock in stocks:
-    # print "stock to add is %s" % stock
+    # logging.info("stock to add is %s" % stock
     query_price = 'SELECT OPEN_PRICE FROM STOCK_HISTORY WHERE TRADING_SYMBOL="%s" AND TRADE_DATE="2005-02-08"' % stock
     cur.execute(query_price)
     result_price = cur.fetchone()
     price = result_price["OPEN_PRICE"]
-    # print "Price of stock is $%s" % price
+    # logging.info("Price of stock is $%s" % price
     broker_portfolio.add_stock(stock, qty, price)
 
 
-print "Broker's portfolio is %s" % broker_portfolio
+logging.info("Broker's portfolio is %s" % broker_portfolio)
 
 # Adding broker_portfolio to broker
 broker.add_portfolio(broker_portfolio)
 
-print "PRINTING broker: %s" % broker
+logging.info("PRINTING broker: %s" % broker)
 
 
 # Start a counter
 for count in range(0, 21+1):
     if count % broker.term == 0:
-        print "Count mod term is 0."
+        logging.debug("Count mod term is 0.")
     else:
-        print "Count = %s" % count
-
-# rndm = random.choice(broker.portfolios[0].portfolios)
-# print type(broker.portfolios)
-# print "Randomly chose %s from broker_portfolio" % str(rndm)
+        logging.debug("Count = %s" % count)
 
 
 give_stocks_margin(margin1, broker)
+give_stocks_margin(margin2, broker)
 give_stocks_short(short1, broker)
+give_stocks_short(short2, broker)
 
 
 db.close()
