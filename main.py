@@ -43,26 +43,31 @@ broker_portfolio = Portfolio()
 
 # Select 4 stocks at random
 stocks = random.sample(all_stocks, 4)
-print "Stocks to add are %s" % (stocks)
+# print "Stocks to add are %s" % (stocks)
 query= 'SELECT SUM(OPEN_PRICE) FROM STOCK_HISTORY WHERE TRADING_SYMBOL IN ("%s","%s","%s","%s") AND TRADE_DATE="2005-02-08"' % (stocks[0], stocks[1], stocks[2], stocks[3])
 cur.execute(query)
 result = cur.fetchone()
 sum_price = int(result["SUM(OPEN_PRICE)"])
 qty = int(round(broker.stock_money / sum_price, 0))
-print "Volume to add for each stock is %s" % qty
+# print "Volume to add for each stock is %s" % qty
 
+# Find stock info and add to portfolio
 for stock in stocks:
-    print "stock to add is %s" % stock
-    query_price = 'SELECT OPEN_PRICE FROM STOCK_HISTORY WHERE TRADING_SYMBOL="%s" AND TRADE_DATE = "2005-02-08"' % stock
+    # print "stock to add is %s" % stock
+    query_price = 'SELECT OPEN_PRICE FROM STOCK_HISTORY WHERE TRADING_SYMBOL="%s" AND TRADE_DATE="2005-02-08"' % stock
     cur.execute(query_price)
     result_price = cur.fetchone()
     price = result_price["OPEN_PRICE"]
-    print "Price of stock is $%s" % price
-    print type(price)
+    # print "Price of stock is $%s" % price
     broker_portfolio.add_stock(stock, qty, price)
 
 print "Broker's portfolio is %s" % broker_portfolio
 
-
+# Start a counter
+for count in range(0, 21+1):
+    if count % broker.term == 0:
+        print "Count mod term is 0."
+    else:
+        print "Count = %s" % count
 
 db.close()
