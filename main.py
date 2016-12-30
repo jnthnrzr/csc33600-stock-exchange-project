@@ -1,5 +1,6 @@
 from entities import Portfolio, Investor, Broker
 from margin import give_stocks_margin
+from short import give_stocks_short
 from decimal import Decimal
 import MySQLdb
 import MySQLdb.cursors
@@ -28,12 +29,12 @@ for row in stocks:
     all_stocks.append((stock_symbol)) #, volume))
 
 # Create short investors
-short1 = Investor("Shorty", 250000)
-short2 = Investor("Morty", 250000)
+short1 = Investor("Short1", 250000)
+short2 = Investor("Short2", 250000)
 
 # Create margin investors
-margin1 = Investor("Corky", 250000)
-margin2 = Investor("Dorky", 250000)
+margin1 = Investor("Margin1", 250000)
+margin2 = Investor("Margin2", 250000)
 
 # Add all investors to the list
 all_investors.extend((short1, short2, margin1, margin2))
@@ -83,8 +84,8 @@ for count in range(0, 21+1):
 # print "Randomly chose %s from broker_portfolio" % str(rndm)
 
 
-give_stocks_margin(short1, broker)
-
+give_stocks_margin(margin1, broker)
+give_stocks_short(short1, broker)
 
 
 db.close()
