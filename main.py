@@ -24,13 +24,7 @@ stocks = cur.fetchall()
 
 for row in stocks:
     stock_symbol = row["TRADING_SYMBOL"]
-    #query_volume = "SELECT VOLUME FROM STOCK_HISTORY WHERE TRADING_SYMBOL='%s' AND TRADE_DATE='2005-02-08'" % stock_symbol
-    #cur.execute(query_volume)
-    #result_volume = cur.fetchone()
-    #volume = int(result_volume["VOLUME"])
     all_stocks.append((stock_symbol)) #, volume))
-
-# print all_stocks
 
 # Create short investors
 short1 = Investor("Shorty", 250000)
@@ -47,6 +41,7 @@ all_investors.extend((short1, short2, margin1, margin2))
 broker = Broker("Gordon Gekko", 1000000)
 broker_portfolio = Portfolio()
 
+# Select 4 stocks at random
 stocks = random.sample(all_stocks, 4)
 print "Stocks to add are %s" % (stocks)
 query= 'SELECT SUM(OPEN_PRICE) FROM STOCK_HISTORY WHERE TRADING_SYMBOL IN ("%s","%s","%s","%s") AND TRADE_DATE="2005-02-08"' % (stocks[0], stocks[1], stocks[2], stocks[3])
@@ -67,6 +62,7 @@ for stock in stocks:
     broker_portfolio.add_stock(stock, qty, price)
 
 print "Broker's portfolio is %s" % broker_portfolio
+
 
 
 db.close()
