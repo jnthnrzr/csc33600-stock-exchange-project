@@ -1,4 +1,5 @@
 from entities import Portfolio, Investor, Broker
+from decimal import Decimal
 import MySQLdb
 import MySQLdb.cursors
 import settings
@@ -44,26 +45,28 @@ all_investors.extend((short1, short2, margin1, margin2))
 
 # Create a broker
 broker = Broker("Gordon Gekko", 1000000)
+broker_portfolio = Portfolio()
 
-#for number in range(0,4):
-    #random_stock = random.choice(all_stocks)
-    #print "random_stock is %s" % random_stock
-    # query_price_vol = 'SELECT OPEN_PRICE, VOLUME FROM STOCK_HISTORY WHERE TRADING_SYMBOL="%s" AND TRADE_DATE = "2005-02-08"' % random_stock
-    #cur.execute(query_price_vol)
-    #result_price_vol = cur.fetchone()
-    #print "price is $%s" % result_price_vol["OPEN_PRICE"]
-    #print "qty is %s" % result_price_vol["VOLUME"]
-s = random.sample(all_stocks, 4)
-print "Stocks to add are %s" % (s)
-# placeholder= '?' # For SQLite. See DBAPI paramstyle.
-# placeholders= ', '.join(placeholder for unused in s)
-query= 'SELECT SUM(OPEN_PRICE) FROM STOCK_HISTORY WHERE TRADING_SYMBOL IN ("%s","%s","%s","%s") AND TRADE_DATE="2005-02-08"' % (s[0], s[1], s[2], s[3])
+stocks = random.sample(all_stocks, 4)
+print "Stocks to add are %s" % (stocks)
+query= 'SELECT SUM(OPEN_PRICE) FROM STOCK_HISTORY WHERE TRADING_SYMBOL IN ("%s","%s","%s","%s") AND TRADE_DATE="2005-02-08"' % (stocks[0], stocks[1], stocks[2], stocks[3])
 cur.execute(query)
 result = cur.fetchone()
 sum_price = int(result["SUM(OPEN_PRICE)"])
-qty = round(broker.stock_money / sum_price)
+qty = int(round(broker.stock_money / sum_price, 0))
 print "Volume to add for each stock is %s" % qty
 
+for stock in stocks:
+    print "stock to add is %s" % stock
+    query_price = 'SELECT OPEN_PRICE FROM STOCK_HISTORY WHERE TRADING_SYMBOL="%s" AND TRADE_DATE = "2005-02-08"' % stock
+    cur.execute(query_price)
+    result_price = cur.fetchone()
+    price = result_price["OPEN_PRICE"]
+    print "Price of stock is $%s" % price
+    print type(price)
+    broker_portfolio.add_stock(stock, qty, price)
+
+print "Broker's portfolio is %s" % broker_portfolio
 
 
 db.close()
