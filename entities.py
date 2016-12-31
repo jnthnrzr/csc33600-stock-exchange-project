@@ -4,6 +4,7 @@
 Defines the Portfolio, Investor, and Broker classes
 """
 import logging
+import random
 
 
 logging.basicConfig(level=logging.DEBUG,
@@ -71,9 +72,10 @@ class Investor:
         """Make an Investor object for stock exchange"""
         self.name = name
         self.cash = cash
-        self.risk_money = 0.5 * cash
+        self.risk_money = 0.5 * self.cash
         self.credit_line = 100000
         self.portfolios = []
+        self.investment_seed = 0.5 * self.risk_money
         # Add to global list of INVESTORS
         INVESTORS.append(self)
 
@@ -81,6 +83,56 @@ class Investor:
         """Add portfolio to investor's financial records"""
         self.portfolios.append(portfolio)
 
+    def get_loan_amount(self):
+        """Return the loan amount for the investor"""
+        loan_amount = min(self.credit_line, (0.5 * self.risk_money))
+        return loan_amount
+
+    def get_stock(self, broker):
+        """Get a random stock from broker"""
+        logging.info("RUNNING give_stocks_margin()...")
+        # Determine loan amount for investor
+        loan = self.get_loan_amount()
+
+        # Give investor loan money & update broker's cash
+        self.cash = self.cash + loan
+        broker.cash = broker.cash - loan
+        
+        # Pay broker fees
+        fee = broker.fee
+        self.cash -= fee
+        broker.cash += fee
+
+        # Randomly select a stock from broker
+        sym, qty, price = random.choice(broker.portfolios[0].portfolios)
+
+        # Buy correct quantity
+        qty_tobuy = int( (self.cash / float(price)) )
+        logging.info("%s stocks buy of symbol = %s will be bought" % (qty, sym) )
+
+        logging.info("BUYING")
+
+        if (qty_tobuy >= qty):
+            first_purchase = qty * float(price)
+            self.cash -= first_purchase
+            logging.info("Buying all of %s" % sym)
+        else:
+            self.cash -= qty_tobuy * float(price)
+
+        logging.info("AFTER BUY")
+
+        p = Portfolio()
+        p.add_stock(sym, qty, price)
+        self.add_portfolio(p)
+        logging.info("stock %s, %s, %s has been added" % (sym, qty, price))
+        # logging.info("PRINTING investor: %s" % investor)
+
+        # Remove stock from broker's portfolio
+        logging.info("Broker portfolio BEFORE removal: %s" % (broker.portfolios[0].portfolios))
+        # logging.info("type: %s" % type(broker.portfolios[0]))
+        broker.portfolios[0].remove_stock(sym, qty)
+
+        logging.info("Broker portfolio AFTER removal: %s" % (broker.portfolios[0].portfolios))
     def __repr__(self):
         """Show details about the Investor"""
         name = "Investor: %s" % self.name
@@ -118,6 +170,20 @@ class Broker:
     def add_portfolio(self, portfolio):
         """Add portfolio to broker's financial records"""
         self.portfolios.append(portfolio)
+
+    def get_stock(self, investor):
+        """Get stock back from the investor"""
+        p = investor.portfolios[0]
+        sym, qty, price = p.portfolios[0]
+        self.add_portfolio(p)
+        logging.info("WHAT ARE YOU")
+        logging.info(investor.portfolios[0].portfolios)
+        investor.portfolios[0].portfolios.remove( (sym, qty, price) )
+        
+        # investor.portfolios[0].remove(sym, qty, price)
+        total_price = qty * price
+        investor.portfolios[0].value -= total_price
+        investor.cash += qty * price
 
     def __repr__(self):
         """Show details about the broker"""
@@ -158,10 +224,19 @@ if __name__ == "__main__":
     logging.info(investor1)
 
     logging.info("Removing stock 'BMD' from portfolio")
-    p1.remove_stock("BMD")
+    p1.remove_stock("BMD", 50)
 
     logging.info("Displaying broker1 info AFTER REMOVING stock")
     logging.info(broker1)
 
     logging.info("Displaying investor1 info AFTER REMOVING stock")
     logging.info(investor1)
+    
+    logging.info("Moving stock from investor1 TO broker1")
+    broker1.get_stock(investor1)
+    
+    logging.info("Displaying investor1 AFTER stock given to broker")
+    logging.info(investor1)
+    logging.info("Displaying broker1 AFTER stock given to broker")
+    logging.info(broker1)
+
