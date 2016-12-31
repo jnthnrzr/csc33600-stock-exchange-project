@@ -11,45 +11,69 @@ from entities import Portfolio
 # Set logging configuration
 logging.basicConfig(level=logging.DEBUG,
                     format=' %(asctime)s - %(levelname)s - %(message)s')
-#logging.disable(logging.CRITICAL)
+logging.disable(logging.CRITICAL)
 
-def give_stocks_margin(investor, broker):
+def buy_on_margin(investor, broker):
+    """Buying on margin 6(b)"""
+    logging.info("BUYING on Margin...")
+    loan = min(investor.credit_line, 0.5 * investor.risk_money)
+    logging.info("Cash $%s, Loan $%s, Risk_money $%s" % (investor.cash, loan, investor.risk_money))
+    old_portfolio = investor.portfolios[0]
+    new_portfolio = investor.portfolios[1]
 
-    logging.info("RUNNING give_stocks_margin()...")
-    # Determine loan amount for investor
-    loan = min(investor.credit_line, (0.5 * investor.risk_money))
-    # Give investor loan money & update broker's cash
-    investor.cash = investor.cash + loan
-    broker.cash = broker.cash - loan
+    logging.info("OLD %s vs NEW %s" % (old_portfolio.value, new_portfolio.value))
 
-    # Randomly select a stock from broker
-    sym, qty, price = random.choice(broker.portfolios[0].portfolios)
-    # logging.info("Selected the stock (%s, %s, $%s) randomly from broker's portfolio" % (sym, qty, price))
-
-    # Buy correct quantity
-    qty_tobuy = int( (investor.cash / float(price)) )
-    logging.info("%s stocks buy of symbol = %s will be bought" % (qty, sym) )
-
-    logging.info("BUYING")
-
-    if (qty_tobuy >= qty):
-        first_purchase = qty * float(price)
-        investor.cash = investor.cash - first_purchase
-        logging.info("Buying all of %s" % sym)
+    if new_portfolio.value > old_portfolio.value:
+        logging.info("Sell stock and repay the broker.")
+        investor.cash += float(new_portfolio.value)
+        sym = old_portfolio.portfolios[0][0]
+        qty = old_portfolio.portfolios[0][1]
+        investor.portfolios[0].remove_stock(sym, qty)
+        logging.info("CALL the update_broker function here.")
+        broker.get_stock(investor)
     else:
-        investor.cash = investor.cash - (qty_tobuy * price)
+        # Price has gone down
+        qty = old_portfolio.portfolios[0][1]
+        # Calculate the Equity
+        equity = float(new_portfolio.value) - investor.get_loan_amount()
+        maintenance_margin = equity / float(new_portfolio.value)
+        logging.info("ELSE statement caught")
+        # 
+        if maintenance_margin > broker.maintenance_threshold:
+            # Calculate the percent decrease in price of stock
+            percent_decrease = float(abs(new_portfolio.portfolios[0][2] - old_portfolio.portfolios[0][2]) / old_portfolio.portfolios[0][2])
+            some_number = investor.investment_seed - ( qty * float(old_portfolio.value) * percent_decrease)
+            margin_call = abs(( (0.25 - maintenance_margin)/(maintenance_margin) ) * equity)
+            logging.info("margin call is $%s" % margin_call)
+            if some_number == 0:
+                logging.info("The investor MUST sell in order to repay the broker.")
+                logging.info("SELL THE STOCKS TO THE MARKET")
+                logging.info("add cash by the newprice * qty")
+                investor.cash += float(new_portfolio.value)
+                sym = old_portfolio.portfolios[0][0]
+                qty = old_portfolio.portfolios[0][1]
+                investor.portfolios[0].remove_stock(sym, qty)
 
-    logging.info("AFTER BUY")
+            elif some_number - margin_call > 0:
+                logging.info("Pay the margin call")
+                logging.info("Decrease investor.cash and increase broker.cash by margin_call amount.")
+                investor.cash -= margin_call
+                broker.cash += margin_call
 
-    p = Portfolio()
-    p.add_stock(sym, qty, price)
-    investor.add_portfolio(p)
-    logging.info("stock %s, %s, %s has been added" % (sym, qty, price))
-    logging.info("PRINTING investor: %s" % investor)
+            else:
+                # some_number is LESS THAN zero
+                logging.info("Margin call cannot be afforded and the stock should be sold at a loss.")
+                logging.info("Don't buy anymore stocks.")
+                investor.cash += float(new_portfolio.value)
+                sym = old_portfolio.portfolios[0][0]
+                qty = old_portfolio.portfolios[0][1]
+                investor.portfolios[0].remove_stock(sym, qty)
 
-    # Remove stock from broker's portfolio
-    logging.info("Broker portfolio BEFORE removal: %s" % (broker.portfolios[0].portfolios))
-    # logging.info("type: %s" % type(broker.portfolios[0]))
-    broker.portfolios[0].remove_stock(sym, qty)
+        else:
+            logging.info("Maintenance margin is LESS THAN maintenance_threshold")
 
-    logging.info("Broker portfolio AFTER removal: %s" % (broker.portfolios[0].portfolios))
+    logging.info("Margin done")
+    logging.info(investor)
+    logging.info("Cash $%s, Loan $%s, Risk_money $%s" % (investor.cash, loan, investor.risk_money))
+    logging.info(broker)
+
