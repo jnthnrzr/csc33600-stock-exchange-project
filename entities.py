@@ -90,7 +90,7 @@ class Investor:
 
     def get_stock(self, broker):
         """Get a random stock from broker"""
-        logging.info("RUNNING give_stocks_margin()...")
+        logging.info("RUNNING get_stock() for investor...")
         # Determine loan amount for investor
         loan = self.get_loan_amount()
 
@@ -104,35 +104,37 @@ class Investor:
         broker.cash += fee
 
         # Randomly select a stock from broker
+        logging.info("What's here: %s" % broker.portfolios)
         sym, qty, price = random.choice(broker.portfolios[0].portfolios)
 
         # Buy correct quantity
         qty_tobuy = int( (self.cash / float(price)) )
-        logging.info("%s stocks buy of symbol = %s will be bought" % (qty, sym) )
+        #logging.info("%s stocks buy of symbol = %s will be bought" % (qty, sym) )
 
-        logging.info("BUYING")
+        #logging.info("BUYING")
 
         if (qty_tobuy >= qty):
             first_purchase = qty * float(price)
             self.cash -= first_purchase
-            logging.info("Buying all of %s" % sym)
+            # logging.info("Buying all of %s" % sym)
         else:
             self.cash -= qty_tobuy * float(price)
 
-        logging.info("AFTER BUY")
+        # logging.info("AFTER BUY")
 
         p = Portfolio()
         p.add_stock(sym, qty, price)
         self.add_portfolio(p)
-        logging.info("stock %s, %s, %s has been added" % (sym, qty, price))
+        # logging.info("stock %s, %s, %s has been added" % (sym, qty, price))
         # logging.info("PRINTING investor: %s" % investor)
 
         # Remove stock from broker's portfolio
-        logging.info("Broker portfolio BEFORE removal: %s" % (broker.portfolios[0].portfolios))
+        # logging.info("Broker portfolio BEFORE removal: %s" % (broker.portfolios[0].portfolios))
         # logging.info("type: %s" % type(broker.portfolios[0]))
         broker.portfolios[0].remove_stock(sym, qty)
 
-        logging.info("Broker portfolio AFTER removal: %s" % (broker.portfolios[0].portfolios))
+        #logging.info("Broker portfolio AFTER removal: %s" % (broker.portfolios[0].portfolios))
+
     def __repr__(self):
         """Show details about the Investor"""
         name = "Investor: %s" % self.name
@@ -173,17 +175,31 @@ class Broker:
 
     def get_stock(self, investor):
         """Get stock back from the investor"""
-        p = investor.portfolios[0]
-        sym, qty, price = p.portfolios[0]
-        self.add_portfolio(p)
-        logging.info("WHAT ARE YOU")
-        logging.info(investor.portfolios[0].portfolios)
-        investor.portfolios[0].portfolios.remove( (sym, qty, price) )
+
+        # Find out the stock details  
+        sym, qty, price = investor.portfolios[0].portfolios[0]
+        # p = investor.portfolios[0]
+        
+        # Check if broker has a portfolio
+        if self.portfolios[0]:
+            self.portfolios[0].add_stock(sym, qty, price)
+        else:
+            # Broker doesn't have a portfolio
+            p = Portfolio()
+            #logging.info("p is: %s" % p)
+            p.add_stock(sym, qty, price)
+            self.add_portfolio(p)
+        logging.info("Broker's portfolios AFTER addition: %s" % self)
+        # logging.info("WHAT ARE YOU")
+        logging.info("Investor portfolio BEFORE removal: %s" % investor.portfolios[0].portfolios)
+        investor.portfolios[0].remove_stock(sym, qty)
+        logging.info("Investor portfolio AFTER removal: %s" % investor.portfolios[0])
+        # investor.portfolios[0].portfolios.remove( (sym, qty, price) )
         
         # investor.portfolios[0].remove(sym, qty, price)
         total_price = qty * price
         investor.portfolios[0].value -= total_price
-        investor.cash += qty * price
+        investor.cash += qty * float(price)
 
     def __repr__(self):
         """Show details about the broker"""

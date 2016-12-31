@@ -2,7 +2,7 @@
 import MySQLdb
 import MySQLdb.cursors
 import settings
-
+import logging
 
 db = MySQLdb.connect(host=settings.HOST,
                      user=settings.USER,
@@ -10,6 +10,12 @@ db = MySQLdb.connect(host=settings.HOST,
                      db=settings.DB,
                      cursorclass=MySQLdb.cursors.DictCursor)
 cursor = db.cursor()
+
+
+# Setup logging configurations
+logging.basicConfig(level=logging.DEBUG,
+                    format=' %(levelname)s - hello - %(asctime)s - %(module)s:%(lineno)d - %(message)s')
+# logging.disable(logging.DEBUG)
 
 def check_version():
     """Check sql version (dummy test function to check active connection)"""
@@ -23,8 +29,11 @@ def check_version():
 def check_price(symbol, year, month, day):
     """Check open price for stock with symbol on year-month-day"""
     sql = 'SELECT OPEN_PRICE FROM STOCK_HISTORY WHERE TRADING_SYMBOL="%s" AND TRADE_DATE="%s-%s-%s"' % (symbol, year, month, day)
+    logging.info("SQL STATEMENT is: %s" % sql)
+    
     cursor.execute(sql)
     result = cursor.fetchone()
+    logging.info("result of sql execution is: %s" % result)
     price = result["OPEN_PRICE"]
     # print "Price for %s on %s-%s-%s is $%s." % (symbol, year,  month, day, price)
     return price

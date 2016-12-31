@@ -39,6 +39,7 @@ def short_seller(investor, broker):
 
     elif (stock_price-cur_stk_price > 0):
         investor.portfolios[0].remove_stock(stock_symbol, stock_quant)
+        del investor.portfolios[0]
         investor.cash += float(old_portfolio.value)
         # buy new portfolio
         investor.portfolios[0].add_stock(stock_symbol, stock_quant, cur_stk_price)
@@ -51,6 +52,7 @@ def short_seller(investor, broker):
     elif ((stock_quant * cur_stk_price) >= max_loss):
         # sale old portfolio, get cash
         investor.portfolios[0].remove_stock(stock_symbol, stock_quant)
+        del investor.portfolios[0]
         investor.cash += float(old_portfolio.value)
         # buy new portfolio
         investor.portfolios[0].add_stock(stock_symbol, stock_quant, cur_stk_price)
@@ -63,5 +65,4 @@ def short_seller(investor, broker):
     
     #print "\n","trade.py",stock_symbol,invest_portf.portfolios, stock_total_value
     #print "\n","current price of ",stock_symbol,cur_stk_price
-    
 
