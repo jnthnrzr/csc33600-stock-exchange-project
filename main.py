@@ -1,6 +1,6 @@
 from entities import Portfolio, Investor, Broker
-from margin import give_stocks_margin
-from short import give_stocks_short
+from margin import buy_on_margin
+from short import short_seller
 from queries import check_price, get_all_stocks
 from decimal import Decimal
 import logging
@@ -88,18 +88,48 @@ for count in range(0, 21+1):
     else:
         logging.debug("Count = %s" % count)
 
-logging.info(broker.portfolios)
-give_stocks_short(short2, broker)
+# logging.info(broker.portfolios)
+# short1.get_stock(broker)
+# p2 = Portfolio()
 
-logging.info(broker.portfolios)
-give_stocks_margin(margin1, broker)
+# find stock name
+# logging.info(short1.portfolios[0].portfolios[0][0])
+# short_stock = short1.portfolios[0].portfolios[0][0]
+# Check the new price of the short stock
+# new_price = check_price(short1.portfolios[0].portfolios[0][0], 2005, 3, 2)
+# logging.info("check_price gives $%s" % new_price)
 
-logging.info(broker.portfolios)
-give_stocks_margin(margin2, broker)
+# p2.add_stock(short_stock, qty, new_price)
 
-logging.info(broker.portfolios)
-give_stocks_short(short1, broker)
 
-logging.info(broker.portfolios)
+margin1.get_stock(broker)
+p3 = Portfolio()
 
+# Find stock to buy on margin
+margin_stock = margin1.portfolios[0].portfolios[0][0]
+# Check the new price of the margin stock
+margin_price = check_price(margin1.portfolios[0].portfolios[0][0], 2005, 3, 2)
+p3.add_stock(margin_price, qty, margin_price)
+margin1.add_portfolio(p3)
+buy_on_margin(margin1, broker)
+
+
+
+# short1.add_portfolio(p2)
+
+#logging.info("short1 BEFORE short selling: %s" % short1)
+#short_seller(short1, broker)
+
+ 
+# logging.info(broker.portfolios)
+# get_stock(margin1, broker)
+# 
+# logging.info(broker.portfolios)
+# get_stock(margin2, broker)
+# 
+# logging.info(broker.portfolios)
+# get_stock(short1, broker)
+# 
+# logging.info(broker.portfolios)
+# 
 db.close()
