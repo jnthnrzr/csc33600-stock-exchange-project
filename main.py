@@ -1,6 +1,7 @@
 from entities import Portfolio, Investor, Broker
 from margin import give_stocks_margin
 from short import give_stocks_short
+from queries import check_price, get_all_stocks
 from decimal import Decimal
 import logging
 import MySQLdb
@@ -26,14 +27,16 @@ cur = db.cursor()
 all_investors = list()
 
 # Create a list of all stocks
-all_stocks = list()
-query_symbols = "SELECT DISTINCT TRADING_SYMBOL FROM STOCK_HISTORY"
-cur.execute(query_symbols)
-stocks = cur.fetchall()
+#all_stocks = list()
+#query_symbols = "SELECT DISTINCT TRADING_SYMBOL FROM STOCK_HISTORY"
+#cur.execute(query_symbols)
+#stocks = cur.fetchall()
 
-for row in stocks:
-    stock_symbol = row["TRADING_SYMBOL"]
-    all_stocks.append((stock_symbol)) #, volume))
+#for row in stocks:
+    #stock_symbol = row["TRADING_SYMBOL"]
+    #all_stocks.append((stock_symbol)) #, volume))
+all_stocks = get_all_stocks()
+
 
 # Create short investors
 short1 = Investor("Short1", 250000)
@@ -53,7 +56,7 @@ broker_portfolio = Portfolio()
 # Select 4 stocks at random
 stocks = random.sample(all_stocks, 4)
 # logging.info("Stocks to add are %s" % (stocks)
-query= 'SELECT SUM(OPEN_PRICE) FROM STOCK_HISTORY WHERE TRADING_SYMBOL IN ("%s","%s","%s","%s") AND TRADE_DATE="2005-02-08"' % (stocks[0], stocks[1], stocks[2], stocks[3])
+query= 'SELECT SUM(OPEN_PRICE) FROM STOCK_HISTORY WHERE TRADING_SYMBOL IN ("%s","%s","%s","%s") AND TRADE_DATE="2005-3-1"' % (stocks[0], stocks[1], stocks[2], stocks[3])
 cur.execute(query)
 result = cur.fetchone()
 sum_price = int(result["SUM(OPEN_PRICE)"])
@@ -63,14 +66,13 @@ qty = int(round(broker.stock_money / sum_price, 0))
 # Find stock info and add to portfolio
 for stock in stocks:
     # logging.info("stock to add is %s" % stock
-    query_price = 'SELECT OPEN_PRICE FROM STOCK_HISTORY WHERE TRADING_SYMBOL="%s" AND TRADE_DATE="2005-02-08"' % stock
-    cur.execute(query_price)
-    result_price = cur.fetchone()
-    price = result_price["OPEN_PRICE"]
+    #query_price = 'SELECT OPEN_PRICE FROM STOCK_HISTORY WHERE TRADING_SYMBOL="%s" AND TRADE_DATE="2005-3-1"' % stock
+    #cur.execute(query_price)
+    #result_price = cur.fetchone()
+    #price = result_price["OPEN_PRICE"]
+    price = check_price(symbol=stock, year=2005, month=3, day=1)
     # logging.info("Price of stock is $%s" % price
     broker_portfolio.add_stock(stock, qty, price)
-
-
 logging.info("Broker's portfolio is %s" % broker_portfolio)
 
 # Adding broker_portfolio to broker
@@ -83,7 +85,6 @@ logging.info("PRINTING broker: %s" % broker)
 for count in range(0, 21+1):
     if count % broker.term == 0:
         logging.debug("Count mod term is 0.")
-
     else:
         logging.debug("Count = %s" % count)
 
