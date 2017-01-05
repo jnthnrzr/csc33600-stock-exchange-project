@@ -1,5 +1,6 @@
-# csc33600-stock-exchange-project
-Final project for Database Systems
+# stock-exchange-simulator
+Final project for Database Systems  
+Simulate short-selling and buying-on-margin using historical stock exchange data
 
 **NOTE:** *python version == 2.6.6*
 
